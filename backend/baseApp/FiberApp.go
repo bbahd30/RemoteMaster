@@ -17,6 +17,7 @@ func FiberApp() *BaseFiberApp {
 	}
 
 	app.registerUserApis()
+	app.registerPatientApis()
 
 	return app
 }
@@ -29,4 +30,14 @@ func (fiberApp *BaseFiberApp) registerUserApis() {
 	apis.GetUsers(userRouter)
 	apis.UpdateUser(userRouter)
 	apis.DeleteUser(userRouter)
+}
+
+func (fiberApp *BaseFiberApp) registerPatientApis() {
+	patientRouter := fiberApp.App.Group("/patient")
+
+	apis.CreatePatient(patientRouter)
+	apis.GetPatient(patientRouter)
+	apis.GetPatients(patientRouter)
+	apis.UpdatePatient(patientRouter)
+	apis.DeletePatient(patientRouter)
 }
