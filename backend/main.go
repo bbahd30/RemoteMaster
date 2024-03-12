@@ -3,6 +3,7 @@ package main
 import (
 	baseApp "backend/baseApp"
 	"backend/database"
+	models "backend/models"
 )
 
 func main() {
@@ -11,10 +12,10 @@ func main() {
 
 	database.ConnectDB()
 
-	// err := database.DB.AutoMigrate()
-	// if err != nil {
-	// 	panic("Error during migration: " + err.Error())
-	// }
+	err := database.DB.AutoMigrate(&models.User{})
+	if err != nil {
+		panic("Error during migration: " + err.Error())
+	}
 
 	app.App.Listen(":3000")
 }
