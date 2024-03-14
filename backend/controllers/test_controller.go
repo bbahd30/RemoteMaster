@@ -165,6 +165,16 @@ func DeleteTest(ctx *fiber.Ctx) error {
 		return err
 	}
 
+	for _, param := range test.Parameters {
+		if err := database.DB.Model(&param).Association("Tests").Delete(&test); err != nil {
+			return err
+		}
+	}
+
+	if err := database.DB.Model(&test).Association("Parameters").Clear(); err != nil {
+		return err
+	}
+
 	database.DB.Delete(&test)
 	result := database.DB.Unscoped().Delete(&models.Test{}, "deleted_at IS NOT NULL")
 	if result.Error != nil {
