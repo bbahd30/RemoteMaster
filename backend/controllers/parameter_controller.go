@@ -96,6 +96,8 @@ func UpdateParameter(ctx *fiber.Ctx) error {
 		}
 	}
 
+	database.DB.Save(&parameter)
+
 	return ctx.SendString("Parameter updated successfully")
 }
 
