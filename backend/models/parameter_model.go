@@ -9,7 +9,7 @@ type Parameter struct {
 	gorm.Model
 	ID            uuid.UUID `gorm:"primaryKey;type:uuid"`
 	ParameterName string    `json:"param_name" gorm:"not null;default:null"`
-	Tests         []*Test   `json:"tests" gorm:"many2many: tests;"`
+	Tests         []*Test   `json:"tests" gorm:"many2many:test_parameter;"`
 }
 
 func (parameter *Parameter) BeforeCreate(tx *gorm.DB) (err error) {

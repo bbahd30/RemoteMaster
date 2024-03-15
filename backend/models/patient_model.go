@@ -9,8 +9,8 @@ import (
 
 type Patient struct {
 	gorm.Model
-	ID           uuid.UUID `gorm:"type:uuid"`
-	Name         string    `json:"name"`
+	ID           uuid.UUID `gorm:"primaryKey;type:uuid"`
+	Name         string    `json:"name" gorm:"not null;default:null"`
 	DateOfBirth  time.Time `json:"dob"`
 	Gender       string    `json:"gender"`
 	ContactPhone string    `json:"phone"`
@@ -19,7 +19,9 @@ type Patient struct {
 }
 
 func (patient *Patient) BeforeCreate(tx *gorm.DB) (err error) {
-	patient.ID = uuid.New()
+	if patient.ID == uuid.Nil {
+		patient.ID = uuid.New()
+	}
 
 	return nil
 }

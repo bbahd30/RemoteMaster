@@ -12,7 +12,7 @@ func main() {
 
 	database.ConnectDB()
 
-	err := database.DB.AutoMigrate(&models.User{}, &models.Patient{}, &models.Test{}, &models.Parameter{})
+	err := database.DB.AutoMigrate(&models.User{}, &models.Patient{}, &models.Test{}, &models.Parameter{}, &models.Booking{}, &models.Result{}, &models.ParamValue{})
 	if err != nil {
 		panic("Error during migration: " + err.Error())
 	}
