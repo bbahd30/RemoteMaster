@@ -9,7 +9,7 @@ import (
 func main() {
 
 	app := baseApp.FiberApp()
-
+	
 	database.ConnectDB()
 
 	err := database.DB.AutoMigrate(&models.User{}, &models.Patient{}, &models.Test{}, &models.Parameter{}, &models.Booking{}, &models.Result{}, &models.ParamValue{}, &models.ParamDetail{})
@@ -17,5 +17,5 @@ func main() {
 		panic("Error during migration: " + err.Error())
 	}
 
-	app.App.Listen(":3000")
+	app.App.Listen(":8000")
 }
