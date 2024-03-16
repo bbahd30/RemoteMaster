@@ -112,6 +112,7 @@ func (fiberApp *BaseFiberApp) registerParamValueApis() {
 	apis.GetParamValues(paramValueRouter)
 	apis.UpdateParamValue(paramValueRouter)
 	apis.DeleteParamValue(paramValueRouter)
+	apis.GetTestValue(paramValueRouter)
 }
 
 func (fiberApp *BaseFiberApp) registerParamDetailApis() {
@@ -122,4 +123,5 @@ func (fiberApp *BaseFiberApp) registerParamDetailApis() {
 	apis.GetParamDetails(paramDetailRouter)
 	apis.UpdateParamDetail(paramDetailRouter)
 	apis.DeleteParamDetail(paramDetailRouter)
+	apis.GetBounds(paramDetailRouter)
 }

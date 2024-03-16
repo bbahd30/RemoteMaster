@@ -55,6 +55,42 @@ func GetParamDetail(ctx *fiber.Ctx) error {
 	return ctx.JSON(paramDetail)
 }
 
+func GetBounds(ctx *fiber.Ctx) error {
+	parameterID := ctx.Params("parameterID")
+	testID := ctx.Params("testID")
+
+	parameterUUID, err := uuid.Parse(parameterID)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid parameter ID"})
+	}
+
+	testUUID, err := uuid.Parse(testID)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid test ID"})
+	}
+
+	paramDetail := new(models.ParamDetail)
+
+	if err := database.DB.Where("parameter_id = ? AND test_id = ?", parameterUUID, testUUID).First(paramDetail).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "ParamDetail not found"})
+		}
+		return err
+	}
+	
+	type Bounds struct {
+        LowerBound float64 `json:"lower_bound"`
+        UpperBound float64 `json:"upper_bound"`
+    }
+
+    bounds := Bounds{
+        LowerBound: paramDetail.LowerBound,
+        UpperBound: paramDetail.UpperBound,
+    }
+
+    return ctx.JSON(bounds)
+}
+
 func UpdateParamDetail(ctx *fiber.Ctx) error {
 	id := ctx.Params("paramDetailID")
 	uuidFromString, err := uuid.Parse(id)

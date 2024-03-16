@@ -1,24 +1,52 @@
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+	BrowserRouter as Router,
+	Routes,
+	Route,
+	useLocation,
+} from "react-router-dom";
+
 import LoginPage from "./Pages/LoginPage";
 import HomePage from "./Pages/HomePage";
 import TestPage from "./Pages/TestPage";
 import BookingPage from "./Pages/BookingPage";
 
+import Sidebar from "./Components/Sidebar";
+import Navigation from "./Components/Navigation";
+
 function App() {
 	return (
-		<>
-			<div className="container">
-				<Router>
+		<Router>
+			<AppContent />
+		</Router>
+	);
+}
+
+function AppContent() {
+	const location = useLocation();
+	const showSidebarAndNavbar = !["/", "/login"].includes(location.pathname);
+
+	return (
+		<div className="app" style={{ display: "flex" }}>
+			{showSidebarAndNavbar && <Sidebar />}
+			<div
+				style={{ flex: 1, paddingLeft: showSidebarAndNavbar ? 280 : 0 }}
+			>
+				{showSidebarAndNavbar && <Navigation />}
+				<div style={{ padding: 16 }}>
 					<Routes>
 						<Route exact path="/" element={<LoginPage />} />
 						<Route exact path="/home" element={<HomePage />} />
 						<Route exact path="/tests" element={<TestPage />} />
-						<Route exact path="/tests" element={<BookingPage />} />
+						<Route
+							exact
+							path="/bookings"
+							element={<BookingPage />}
+						/>
 					</Routes>
-				</Router>
+				</div>
 			</div>
-		</>
+		</div>
 	);
 }
 
