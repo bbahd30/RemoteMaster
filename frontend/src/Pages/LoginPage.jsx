@@ -27,10 +27,8 @@ const LoginPage = () => {
 			username: username,
 			password: password,
 		};
-		console.log(userData);
 		dispatch(login(userData)).then((response) => {
 			if (response.payload) {
-				console.log(response);
 				navigate("/home");
 			}
 		});

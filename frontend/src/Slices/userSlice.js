@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { login_api } from "../Links";
+import { loginApi } from "../Links";
 
 export const login = createAsyncThunk("user/login", (userData) => {
 	return axios
-		.post(login_api, userData)
+		.post(loginApi, userData)
 		.then((response) => {
 			if (response.status === 200) {
 				localStorage.setItem("user", JSON.stringify(response.data));
@@ -26,10 +26,7 @@ const userSlice = createSlice({
 		error: "",
 	},
 	reducers: {
-		setUser: (state, action) => {
-			console.log("====================");
-			state.user = action.payload;
-		},
+		setUser: (state, action) => void (state.user = action.payload),
 	},
 	extraReducers: (builder) => {
 		builder

@@ -1,2 +1,9 @@
 export const localhost = "http://127.0.0.1:8000/";
-export const login_api = `${localhost}login/`;
+export const loginApi = `${localhost}login/`;
+export const bookingApi = `${localhost}booking/`;
+export const patientApi = `${localhost}patient/`;
+export const testApi = `${localhost}test/`;
+export const resultApi = `${localhost}result/`;
+export const parameterApi = `${localhost}parameter/`;
+export const paramDetailApi = `${localhost}param_detail/`;
+export const paramValueApi = `${localhost}param_value/`;
