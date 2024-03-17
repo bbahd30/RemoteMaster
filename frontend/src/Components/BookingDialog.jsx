@@ -1,8 +1,10 @@
-import React, { forwardRef, useEffect } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
 	AppBar,
 	Box,
 	Button,
+	Collapse,
 	Dialog,
 	IconButton,
 	Slide,
@@ -11,18 +13,22 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-import { useDispatch, useSelector } from "react-redux";
 import { resetBooking, setDialogOpen } from "../Slices/bookingSlice";
 import { resetParameter, setParameterIDs } from "../Slices/parameterSlice";
-import ParameterCard from "./ParameterCard";
 import { resetTest } from "../Slices/testSlice";
-import { resetPatient } from "../Slices/patientSlice";
+import { resetPatient, setImage } from "../Slices/patientSlice";
+import ParameterCard from "./ParameterCard";
+import PDFDownloadBtn from "./PdfDownloadBtn";
+import HumanBodySVG from "./HumanBody/HumanBody";
+import svgToDataURL from "./svgToDataURL";
 
 const BookingDialog = () => {
 	const dispatch = useDispatch();
+	const [generate, setGenerate] = useState(false);
 	const open = useSelector((state) => state.booking.open);
-	const patient = useSelector((state) => state.patient.selectedPatient);
 	const test = useSelector((state) => state.test.selectedTest);
+	const image = useSelector((state) => state.patient.imageDataUrl);
+	const patient = useSelector((state) => state.patient.selectedPatient);
 
 	const handleClose = () => {
 		dispatch(setDialogOpen());
@@ -32,6 +38,26 @@ const BookingDialog = () => {
 		// dispatch(resetParameter());
 		// dispatch(resetPatient());
 	};
+
+	const generatePDF = () => {
+		const svgElement = document.getElementById("humanBody");
+		svgToDataURL(svgElement)
+			.then((image64) => {
+				dispatch(setImage(image64));
+			})
+			.catch((error) => {
+				console.error("Error converting SVG to image", error);
+			});
+	};
+
+	const handleImage = () => {
+		if (generate) {
+			generatePDF();
+		} else {
+			setGenerate(true);
+		}
+	};
+
 	const Transition = forwardRef(function Transition(props, ref) {
 		return <Slide direction="up" ref={ref} {...props} />;
 	});
@@ -48,6 +74,7 @@ const BookingDialog = () => {
 			dispatch(setParameterIDs(params));
 		}
 	}, [test]);
+
 	return (
 		<Dialog
 			fullScreen
@@ -72,9 +99,12 @@ const BookingDialog = () => {
 					>
 						{patient?.name}
 					</Typography>
-					<Button autoFocus color="inherit" onClick={handleClose}>
-						Save
-					</Button>
+					<PDFDownloadBtn
+						patient={patient}
+						test={test}
+						image={image}
+						onClick={handleClose}
+					/>
 				</Toolbar>
 			</AppBar>
 			<Box p={2}>
@@ -88,6 +118,43 @@ const BookingDialog = () => {
 					{test?.parameters?.map((param) => (
 						<ParameterCard parameter={param} />
 					))}
+				</Box>
+			</Box>
+			<Box sx={{ display: "flex", justifyContent: "space-between" }}>
+				<AppBar
+					position="fixed"
+					sx={{
+						top: "auto",
+						bottom: 0,
+						backgroundColor: "transparent",
+					}}
+				>
+					<Button onClick={handleImage}>
+						{generate ? "Save Image" : "Mark affected Body Parts"}
+					</Button>
+				</AppBar>
+				<Box
+					sx={{
+						flex: 1,
+						width: "100%",
+						py: 5,
+						display: "flex",
+						justifyContent: "flex-end",
+					}}
+				>
+					<Collapse in={generate}>
+						<HumanBodySVG />
+					</Collapse>
+				</Box>
+				<Box sx={{ flex: 1, padding: 2 }}>
+					<Typography fontFamily={"Poppins"} variant="h4">
+						Instructions
+					</Typography>
+					<Typography fontFamily={"Poppins"} variant="body1">
+						Click on the affected body parts as per the order of
+						parameters tested. The body parts will be marked. You
+						can reset them too if order is wrong.
+					</Typography>
 				</Box>
 			</Box>
 		</Dialog>
