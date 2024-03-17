@@ -1,5 +1,5 @@
 function svgToDataURL(svgElement) {
-	const scaleFactor = 5;
+	const scaleFactor = 7;
 	return new Promise((resolve, reject) => {
 		try {
 			const serializer = new XMLSerializer();
@@ -37,7 +37,7 @@ function svgToDataURL(svgElement) {
 				canvas.height = img.height * scaleFactor;
 				const ctx = canvas.getContext("2d");
 
-				ctx.scale(scaleFactor, scaleFactor);
+				ctx.scale(6, 6);
 
 				ctx.drawImage(img, 0, 0);
 

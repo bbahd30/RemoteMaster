@@ -48,7 +48,13 @@ const HealthCard = ({ param }) => {
 						<Typography
 							fontFamily={"Poppins"}
 							variant="body2"
-							sx={{ ml: 0.5 }}
+							sx={{
+								ml: 0.5,
+								fontWeight:
+									param.value < param.lower_bound
+										? "bold"
+										: "normal",
+							}}
 						>
 							Low (L)
 						</Typography>
@@ -66,7 +72,14 @@ const HealthCard = ({ param }) => {
 						<Typography
 							fontFamily={"Poppins"}
 							variant="body2"
-							sx={{ ml: 0.5 }}
+							sx={{
+								ml: 0.5,
+								fontWeight:
+									param.value > param.lower_bound &&
+									param.value < param.upper_bound
+										? "bold"
+										: "normal",
+							}}
 						>
 							Normal (N)
 						</Typography>
@@ -84,7 +97,13 @@ const HealthCard = ({ param }) => {
 						<Typography
 							fontFamily={"Poppins"}
 							variant="body2"
-							sx={{ ml: 0.5 }}
+							sx={{
+								ml: 0.5,
+								fontWeight:
+									param.value > param.upper_bound
+										? "bold"
+										: "normal",
+							}}
 						>
 							High (H)
 						</Typography>

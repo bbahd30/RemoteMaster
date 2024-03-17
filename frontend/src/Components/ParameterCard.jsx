@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Paper, Typography, Box } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import HealthCard from "./HealthCard";
 import { getBounds, getValue, setFoundBound } from "../Slices/parameterSlice";
 
-const ParameterCard = ({ parameter }) => {
+const ParameterCard = ({ parameter, color }) => {
 	const dispatch = useDispatch();
 	const testID = useSelector((state) => state.test.selectedID);
 	const boundFound = useSelector((state) => state.parameter.boundFound);
@@ -35,20 +35,24 @@ const ParameterCard = ({ parameter }) => {
 			param.value < param.lower_bound ||
 			param.value > param.upper_bound
 		) {
-			return "#ff0000";
+			return "#d93333de";
 		}
 		return "#149914";
 	};
 
 	return (
-		<Paper
-			elevation={3}
-			sx={{
+		<div
+			style={{
 				position: "relative",
 				fontFamily: "Poppins",
-				p: 3,
-				m: 2,
+				padding: 30,
+				margin: 2,
 				width: "max-content",
+				boxShadow:
+					"rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
+				borderBottomStyle: "solid",
+				borderBottomWidth: "6px",
+				borderBottomColor: GetStatus(),
 			}}
 		>
 			<Box
@@ -59,7 +63,7 @@ const ParameterCard = ({ parameter }) => {
 					width: 12,
 					height: 12,
 					borderRadius: "50%",
-					backgroundColor: GetStatus(),
+					backgroundColor: color,
 				}}
 			/>
 			<Typography
@@ -92,7 +96,7 @@ const ParameterCard = ({ parameter }) => {
 				</Typography>
 			)}
 			<HealthCard param={param} />
-		</Paper>
+		</div>
 	);
 };
 

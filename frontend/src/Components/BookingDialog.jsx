@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	AppBar,
@@ -14,21 +14,30 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 
 import { resetBooking, setDialogOpen } from "../Slices/bookingSlice";
-import { resetParameter, setParameterIDs } from "../Slices/parameterSlice";
+import {
+	resetParameter,
+	setOrderColor,
+	setParameterIDs,
+} from "../Slices/parameterSlice";
 import { resetTest } from "../Slices/testSlice";
 import { resetPatient, setImage } from "../Slices/patientSlice";
 import ParameterCard from "./ParameterCard";
 import PDFDownloadBtn from "./PdfDownloadBtn";
 import HumanBodySVG from "./HumanBody/HumanBody";
 import svgToDataURL from "./svgToDataURL";
+import generateRandomColor from "../utils/colorGenerate";
 
 const BookingDialog = () => {
 	const dispatch = useDispatch();
 	const [generate, setGenerate] = useState(false);
 	const open = useSelector((state) => state.booking.open);
 	const test = useSelector((state) => state.test.selectedTest);
-	const image = useSelector((state) => state.patient.imageDataUrl);
+	const parameters = test?.parameters;
+	const bodyImage = useSelector((state) => state.patient.imageDataUrl);
 	const patient = useSelector((state) => state.patient.selectedPatient);
+	const colors = useSelector((state) => state.parameter.orderColor);
+
+	const paramRef = useRef();
 
 	const handleClose = () => {
 		dispatch(setDialogOpen());
@@ -64,7 +73,7 @@ const BookingDialog = () => {
 
 	useEffect(() => {
 		let params = [];
-		test?.parameters?.map((param) => {
+		parameters?.map((param) => {
 			let value = {
 				id: param.ID,
 			};
@@ -74,6 +83,16 @@ const BookingDialog = () => {
 			dispatch(setParameterIDs(params));
 		}
 	}, [test]);
+
+	useEffect(() => {
+		if (parameters?.length > 0) {
+			let orderColor = [];
+			parameters?.map((param) => {
+				orderColor.push(generateRandomColor());
+			});
+			dispatch(setOrderColor(orderColor));
+		}
+	}, [parameters]);
 
 	return (
 		<Dialog
@@ -102,8 +121,8 @@ const BookingDialog = () => {
 					<PDFDownloadBtn
 						patient={patient}
 						test={test}
-						image={image}
-						onClick={handleClose}
+						bodyImage={bodyImage}
+						paramRef={paramRef}
 					/>
 				</Toolbar>
 			</AppBar>
@@ -114,39 +133,41 @@ const BookingDialog = () => {
 				<Typography fontFamily={"Poppins"} variant="h6" sx={{ p: 2 }}>
 					{test?.test_name}
 				</Typography>
-				<Box sx={{ display: "flex" }}>
-					{test?.parameters?.map((param) => (
-						<ParameterCard parameter={param} />
+				<Box
+					ref={paramRef}
+					sx={{ display: "flex", gap: 4, flexWrap: "wrap" }}
+				>
+					{parameters?.map((param, id) => (
+						<ParameterCard
+							key={id}
+							color={colors[id]}
+							parameter={param}
+						/>
 					))}
 				</Box>
 			</Box>
-			<Box sx={{ display: "flex", justifyContent: "space-between" }}>
-				<AppBar
-					position="fixed"
-					sx={{
-						top: "auto",
-						bottom: 0,
-						backgroundColor: "transparent",
-					}}
-				>
-					<Button onClick={handleImage}>
-						{generate ? "Save Image" : "Mark affected Body Parts"}
-					</Button>
-				</AppBar>
-				<Box
-					sx={{
-						flex: 1,
-						width: "100%",
-						py: 5,
-						display: "flex",
-						justifyContent: "flex-end",
-					}}
-				>
-					<Collapse in={generate}>
-						<HumanBodySVG />
-					</Collapse>
-				</Box>
-				<Box sx={{ flex: 1, padding: 2 }}>
+			<AppBar
+				position="fixed"
+				sx={{
+					top: "auto",
+					bottom: 0,
+					backgroundColor: "transparent",
+				}}
+			>
+				<Button onClick={handleImage}>
+					{generate ? "Save Image" : "Mark affected Body Parts"}
+				</Button>
+			</AppBar>
+			<Box
+				sx={{
+					display: "flex",
+					marginLeft: "50%",
+					transform: "translateX(-50%)",
+					alignContent: "center",
+					width: "max-content",
+				}}
+			>
+				<Box sx={{ padding: 2, maxWidth: "20rem" }}>
 					<Typography fontFamily={"Poppins"} variant="h4">
 						Instructions
 					</Typography>
@@ -155,6 +176,17 @@ const BookingDialog = () => {
 						parameters tested. The body parts will be marked. You
 						can reset them too if order is wrong.
 					</Typography>
+				</Box>
+				<Box
+					sx={{
+						width: "100%",
+						py: 5,
+						width: "max-content",
+					}}
+				>
+					<Collapse in={generate}>
+						<HumanBodySVG />
+					</Collapse>
 				</Box>
 			</Box>
 		</Dialog>
