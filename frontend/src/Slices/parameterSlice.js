@@ -28,6 +28,42 @@ export const getParameter = createAsyncThunk("parameter/get", (id) => {
 		});
 });
 
+export const createBound = createAsyncThunk(
+	"paramDetail/createBound",
+	(data) => {
+		return axios
+			.post(paramDetailApi, data)
+			.then((response) => {
+				if (response.status === 200) {
+					return response.data;
+				}
+			})
+			.catch((error) => {
+				throw new Error(
+					error.response.data.message || "An error occurred"
+				);
+			});
+	}
+);
+
+export const addTestValue = createAsyncThunk(
+	"paramDetail/addTestValue",
+	(data) => {
+		return axios
+			.post(paramValueApi, data)
+			.then((response) => {
+				if (response.status === 200) {
+					return response.data;
+				}
+			})
+			.catch((error) => {
+				throw new Error(
+					error.response.data.message || "An error occurred"
+				);
+			});
+	}
+);
+
 export const getBounds = createAsyncThunk("paramDetail/get", (paramDetail) => {
 	const paramID = paramDetail["id"];
 	const testID = paramDetail["testID"];
@@ -52,15 +88,17 @@ export const getValue = createAsyncThunk(
 	"paramDetail/getValue",
 	(paramDetail) => {
 		const paramID = paramDetail["id"];
-		const testID = paramDetail["testID"];
+		const bookingID = paramDetail["bookingID"];
 
 		return axios
-			.get(`${paramValueApi}${paramID}/${testID}`)
+			.get(`${paramValueApi}${paramID}/${bookingID}`)
 			.then((response) => {
 				if (response.status === 200) {
 					let res = {
 						paramID: paramID,
-						data: { value: response.data },
+						data: {
+							value: response.data,
+						},
 					};
 					return res;
 				}
@@ -101,6 +139,8 @@ const parameterSlice = createSlice({
 		parameterIDsList: null,
 		selected: null,
 		boundFound: false,
+		orderColor: [],
+		paramDetailFilled: true,
 		error: "",
 	},
 	reducers: {
@@ -113,6 +153,12 @@ const parameterSlice = createSlice({
 		resetParameter: (state) => {
 			state.parameterIDsList = null;
 			state.boundFound = false;
+		},
+		resetDetail: (state) => {
+			state.paramDetailFilled = false;
+		},
+		setOrderColor: (state, action) => {
+			state.orderColor = action.payload;
 		},
 	},
 	extraReducers: (builder) => {
@@ -148,13 +194,11 @@ const parameterSlice = createSlice({
 			})
 			.addCase(createParameter.fulfilled, (state, action) => {
 				state.loading = false;
-				state.parametersList = [];
 				state.selected = [];
 				state.error = "";
 			})
 			.addCase(createParameter.rejected, (state, action) => {
 				state.loading = false;
-				state.parametersList = [];
 				state.selected = [];
 				state.error = action.error.message;
 			})
@@ -163,12 +207,14 @@ const parameterSlice = createSlice({
 			})
 			.addCase(getBounds.fulfilled, (state, action) => {
 				state.loading = false;
+				state.paramDetailFilled = true;
 				const { paramID, data } = action.payload;
 				state.parameterIDsList = state.parameterIDsList.map((param) =>
 					param.id === paramID ? { ...param, ...data } : param
 				);
 			})
 			.addCase(getBounds.rejected, (state, action) => {
+				state.paramDetailFilled = false;
 				state.loading = false;
 				state.parametersList = [];
 				state.selected = [];
@@ -189,10 +235,45 @@ const parameterSlice = createSlice({
 				state.parametersList = [];
 				state.selected = [];
 				state.error = action.error.message;
+			})
+			.addCase(createBound.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(createBound.fulfilled, (state, action) => {
+				state.loading = false;
+				state.paramDetail = false;
+				state.selected = [];
+				state.error = "";
+			})
+			.addCase(createBound.rejected, (state, action) => {
+				state.loading = false;
+				state.paramDetail = false;
+				state.selected = [];
+				state.error = action.error.message;
+			})
+			.addCase(addTestValue.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(addTestValue.fulfilled, (state, action) => {
+				state.loading = false;
+				state.paramDetail = false;
+				state.selected = [];
+				state.error = "";
+			})
+			.addCase(addTestValue.rejected, (state, action) => {
+				state.loading = false;
+				state.paramDetail = false;
+				state.selected = [];
+				state.error = action.error.message;
 			});
 	},
 });
 
 export default parameterSlice.reducer;
-export const { setParameterIDs, setFoundBound, resetParameter } =
-	parameterSlice.actions;
+export const {
+	setParameterIDs,
+	setFoundBound,
+	resetParameter,
+	setOrderColor,
+	resetDetail,
+} = parameterSlice.actions;
