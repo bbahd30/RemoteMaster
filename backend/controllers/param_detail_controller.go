@@ -59,9 +59,18 @@ func GetBounds(ctx *fiber.Ctx) error {
 	parameterID := ctx.Params("parameterID")
 	testID := ctx.Params("testID")
 
+	
 	parameterUUID, err := uuid.Parse(parameterID)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid parameter ID"})
+	}
+	
+	parameter := new(models.Parameter)
+	if err := database.DB.First(&parameter, parameterUUID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "ParamDetail not found"})
+		}
+		return err
 	}
 
 	testUUID, err := uuid.Parse(testID)
@@ -81,11 +90,15 @@ func GetBounds(ctx *fiber.Ctx) error {
 	type Bounds struct {
         LowerBound float64 `json:"lower_bound"`
         UpperBound float64 `json:"upper_bound"`
+		ParameterName string `json:"param_name"`
+		Unit string `json:"unit"`
     }
 
     bounds := Bounds{
         LowerBound: paramDetail.LowerBound,
         UpperBound: paramDetail.UpperBound,
+		ParameterName: parameter.ParameterName,
+		Unit: paramDetail.Unit,
     }
 
     return ctx.JSON(bounds)

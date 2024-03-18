@@ -13,6 +13,7 @@ type LoginResponse struct {
 }
 
 type UserResponse struct {
+	ID 		 string    `json:"ID"`
     Username string    `json:"username"`
 	Name     string    `json:"name"`
 	Email    string    `json:"email"`
@@ -33,6 +34,7 @@ func Login(ctx *fiber.Ctx) error {
     }
 
 	userResponse := UserResponse{
+		ID: user.ID.String(),
         Username: user.Username,
 		Name: user.Name,
 		Email: user.Email,

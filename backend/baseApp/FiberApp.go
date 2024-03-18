@@ -31,7 +31,6 @@ func FiberApp() *BaseFiberApp {
 	app.registerTestApis()
 	app.registerParameterApis()
 	app.registerBookingApis()
-	app.registerResultApis()
 	app.registerParamValueApis()
 	app.registerParamDetailApis()
 
@@ -92,16 +91,6 @@ func (fiberApp *BaseFiberApp) registerBookingApis() {
 	apis.GetBookings(bookingRouter)
 	apis.UpdateBooking(bookingRouter)
 	apis.DeleteBooking(bookingRouter)
-}
-
-func (fiberApp *BaseFiberApp) registerResultApis() {
-	resultRouter := fiberApp.App.Group("/result")
-
-	apis.CreateResult(resultRouter)
-	apis.GetResult(resultRouter)
-	apis.GetResults(resultRouter)
-	apis.UpdateResult(resultRouter)
-	apis.DeleteResult(resultRouter)
 }
 
 func (fiberApp *BaseFiberApp) registerParamValueApis() {

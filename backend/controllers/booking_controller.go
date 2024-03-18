@@ -28,21 +28,11 @@ func CreateBooking(ctx *fiber.Ctx) error {
 
 	booking.ID = uuid.New()
 
-	result := &models.Result{
-		ID:        uuid.New(),
-		BookingID: booking.ID,
-	}
-	if err := database.DB.Create(result).Error; err != nil {
-		return err
-	}
-
-	booking.ResultID = result.ID
-
 	if err := database.DB.Create(&booking).Error; err != nil {
 		return err
 	}
 
-	database.DB.Preload("Result").Preload("Lead").Preload("Test").Preload("Patient").First(&booking, booking.ID)
+	database.DB.Preload("Lead").Preload("Test").Preload("Patient").First(&booking, booking.ID)
 	if err := database.DB.Save(&booking).Error; err != nil {
 		return err
 	}
@@ -54,7 +44,7 @@ func ListBookings(ctx *fiber.Ctx) error {
 	bookings := []models.Booking{}
 	database.DB.Preload("Patient").Preload("Lead").Preload("Test", func(db *gorm.DB) *gorm.DB {
         return db.Preload("Parameters")
-    }).Preload("Result").Find(&bookings)
+    }).Find(&bookings)
 
 	return ctx.JSON(bookings)
 }
@@ -69,7 +59,7 @@ func GetBooking(ctx *fiber.Ctx) error {
 
 	booking := new(models.Booking)
 
-	if err := database.DB.Preload("Patient").Preload("Lead").Preload("Test").Preload("Result").First(&booking, uuidFromString).Error; err != nil {
+	if err := database.DB.Preload("Patient").Preload("Lead").Preload("Test").First(&booking, uuidFromString).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Booking not found"})
 		}
@@ -96,7 +86,7 @@ func UpdateBooking(ctx *fiber.Ctx) error {
 	}
 
 	booking := new(models.Booking)
-	if err := database.DB.Preload("Patient").Preload("Lead").Preload("Test").Preload("Result").First(&booking, uuidFromString).Error; err != nil {
+	if err := database.DB.Preload("Patient").Preload("Lead").Preload("Test").First(&booking, uuidFromString).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Booking not found"})
 		}
@@ -111,10 +101,6 @@ func DeleteBooking(ctx *fiber.Ctx) error {
 	uuidFromString, err := uuid.Parse(bookingID)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid booking ID format"})
-	}
-
-	if err := database.DB.Where("booking_id = ?", uuidFromString).Delete(&models.Result{}).Error; err != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to delete associated results"})
 	}
 
 	if err := database.DB.Delete(&models.Booking{}, uuidFromString).Error; err != nil {
