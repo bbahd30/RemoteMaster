@@ -14,6 +14,7 @@ type ParamDetail struct {
 	LowerBound  float64   `json:"lower_bound" gorm:"type:decimal(10,2);default:0.0"`
 	UpperBound  float64   `json:"upper_bound" gorm:"type:decimal(10,2);default:0.0"` // need to fix unable to update as 0.0
 	TestName    string    `json:"test_name"`
+	Unit	    string 	  `json:"unit" gorm:"default:''"`
 }
 
 func (paramDetail *ParamDetail) BeforeCreate(tx *gorm.DB) (err error) {

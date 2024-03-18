@@ -35,3 +35,9 @@ func DeleteParamDetail(paramDetailGroup fiber.Router) {
 		return controllers.DeleteParamDetail(ctx)
 	})
 }
+
+func GetBounds(paramDetailGroup fiber.Router) {
+	paramDetailGroup.Get("/:parameterID/:testID", func(ctx *fiber.Ctx) error {
+		return controllers.GetBounds(ctx)
+	})
+}

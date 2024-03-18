@@ -15,7 +15,8 @@ type Result struct {
 }
 
 func (result *Result) BeforeCreate(tx *gorm.DB) (err error) {
-	result.ID = uuid.New()
-
+	if(result.ID == uuid.Nil){
+		result.ID = uuid.New()
+	}
 	return nil
 }

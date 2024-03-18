@@ -52,7 +52,9 @@ func CreateBooking(ctx *fiber.Ctx) error {
 
 func ListBookings(ctx *fiber.Ctx) error {
 	bookings := []models.Booking{}
-	database.DB.Preload("Patient").Preload("Lead").Preload("Test").Preload("Result").Find(&bookings)
+	database.DB.Preload("Patient").Preload("Lead").Preload("Test", func(db *gorm.DB) *gorm.DB {
+        return db.Preload("Parameters")
+    }).Preload("Result").Find(&bookings)
 
 	return ctx.JSON(bookings)
 }

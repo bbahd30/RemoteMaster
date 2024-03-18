@@ -11,7 +11,7 @@ type User struct {
 	Username string    `json:"username" gorm:"not null;unique;default:null`
 	Password string    `json:"password" gorm:"not null;default:null"`
 	Name     string    `json:"name"`
-	// Email        string    `json:"email"`
+	Email    string    `json:"email"`
 }
 
 func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
