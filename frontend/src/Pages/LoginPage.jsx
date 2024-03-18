@@ -29,7 +29,7 @@ const LoginPage = () => {
 		};
 		dispatch(login(userData)).then((response) => {
 			if (response.payload) {
-				navigate("/home");
+				navigate("/bookings");
 			}
 		});
 	};

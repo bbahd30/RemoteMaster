@@ -100,13 +100,11 @@ const testSlice = createSlice({
 			})
 			.addCase(createTest.fulfilled, (state, action) => {
 				state.loading = false;
-				state.testsList = [];
 				state.selectedID = [];
 				state.error = "";
 			})
 			.addCase(createTest.rejected, (state, action) => {
 				state.loading = false;
-				state.testsList = [];
 				state.selectedID = [];
 				state.error = action.error.message;
 			});

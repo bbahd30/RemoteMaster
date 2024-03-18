@@ -104,13 +104,11 @@ const patientSlice = createSlice({
 			})
 			.addCase(createPatient.fulfilled, (state, action) => {
 				state.loading = false;
-				state.patientsList = [];
 				state.selectedID = [];
 				state.error = "";
 			})
 			.addCase(createPatient.rejected, (state, action) => {
 				state.loading = false;
-				state.patientsList = [];
 				state.selectedID = [];
 				state.error = action.error.message;
 			});

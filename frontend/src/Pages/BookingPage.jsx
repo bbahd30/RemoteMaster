@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import Navigation from "../Components/Navigation";
-import { Box, Button, Toolbar, Typography } from "@mui/material";
-import { setUser } from "../Slices/userSlice";
+import { Box, Toolbar, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { getBookings } from "../Slices/bookingSlice";
 import BookingTable from "../Components/BookingTable";
+import BookingFormDialog from "../Components/BookingFormDialog";
 
 const BookingPage = () => {
 	const dispatch = useDispatch();
@@ -24,9 +23,7 @@ const BookingPage = () => {
 					>
 						Bookings
 					</Typography>
-					<Button variant="contained" color="primary">
-						Add Booking
-					</Button>
+					<BookingFormDialog />
 				</Toolbar>
 			</Box>
 			<BookingTable />

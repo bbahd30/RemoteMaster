@@ -132,7 +132,7 @@ const BookingRow = (props) => {
 											{row.Patient.gender}
 										</TableCell>
 										<TableCell align="right">
-											{row.Patient.phone}
+											{row.Patient.contact_phone}
 										</TableCell>
 										<TableCell align="right">
 											{row.Patient.email}
