@@ -10,15 +10,16 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 
-import BloodtypeIcon from "@mui/icons-material/Bloodtype";
 import AddToQueueIcon from "@mui/icons-material/AddToQueue";
 import ColorizeIcon from "@mui/icons-material/Colorize";
+import GroupIcon from "@mui/icons-material/Group";
+import ScienceIcon from "@mui/icons-material/Science";
 
 const links = [
 	{ path: `/parameters`, label: "Parameters", icon: <ColorizeIcon /> },
-	{ path: `/tests`, label: "Tests", icon: <BloodtypeIcon /> },
+	{ path: `/tests`, label: "Tests", icon: <ScienceIcon /> },
 	{ path: `/bookings`, label: "Bookings", icon: <AddToQueueIcon /> },
-	{ path: `/patients`, label: "Patients", icon: <AddToQueueIcon /> },
+	{ path: `/patients`, label: "Patients", icon: <GroupIcon /> },
 ];
 
 const ListComponent = ({ toggleDrawer }) => (
