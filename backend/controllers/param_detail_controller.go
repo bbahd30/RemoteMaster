@@ -59,9 +59,18 @@ func GetBounds(ctx *fiber.Ctx) error {
 	parameterID := ctx.Params("parameterID")
 	testID := ctx.Params("testID")
 
+	
 	parameterUUID, err := uuid.Parse(parameterID)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid parameter ID"})
+	}
+	
+	parameter := new(models.Parameter)
+	if err := database.DB.First(&parameter, parameterUUID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "ParamDetail not found"})
+		}
+		return err
 	}
 
 	testUUID, err := uuid.Parse(testID)
@@ -73,7 +82,8 @@ func GetBounds(ctx *fiber.Ctx) error {
 
 	if err := database.DB.Where("parameter_id = ? AND test_id = ?", parameterUUID, testUUID).First(paramDetail).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "ParamDetail not found"})
+			return ctx.JSON(nil)
+			// return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "ParamDetail not found"})
 		}
 		return err
 	}
@@ -81,15 +91,71 @@ func GetBounds(ctx *fiber.Ctx) error {
 	type Bounds struct {
         LowerBound float64 `json:"lower_bound"`
         UpperBound float64 `json:"upper_bound"`
+		ParameterName string `json:"param_name"`
+		Unit string `json:"unit"`
     }
 
     bounds := Bounds{
         LowerBound: paramDetail.LowerBound,
         UpperBound: paramDetail.UpperBound,
+		ParameterName: parameter.ParameterName,
+		Unit: paramDetail.Unit,
     }
 
     return ctx.JSON(bounds)
 }
+
+
+func GetStatusData(ctx *fiber.Ctx) error {
+	type RequestData struct {
+		ParamID uuid.UUID `json:"paramID"`
+		TestID  uuid.UUID `json:"testID"`
+		Status  int       `json:"status"`
+	}
+
+	var requestData []RequestData
+	if err := ctx.BodyParser(&requestData); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot parse request data"})
+	}
+
+	type BoundsText struct {
+		LowerText  string `json:"lower_text"`
+		UpperText  string `json:"upper_text"`
+		NormalText string `json:"normal_text"`
+		LowerReasons string `json:"lower_reasons"`
+		UpperReasons string `json:"upper_reasons"`
+	}
+
+	responseData := make([]BoundsText, len(requestData))
+
+	for i, data := range requestData {
+		var paramDetail models.ParamDetail
+		if err := database.DB.Where("parameter_id = ? AND test_id = ?", data.ParamID, data.TestID).First(&paramDetail).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "ParamDetail not found for parameter " + data.ParamID.String()})
+			}
+			return err
+		}
+
+		switch data.Status {
+		case -1:
+			responseData[i] = BoundsText{
+				LowerText:    paramDetail.LowerText,
+				LowerReasons: paramDetail.LowerReasons,
+			}
+		case 0:
+			responseData[i] = BoundsText{NormalText: "Good Job!, You are in normal range"}
+		case 1:
+			responseData[i] = BoundsText{
+				UpperText:    paramDetail.UpperText,
+				UpperReasons: paramDetail.UpperReasons,
+			}
+		}
+	}
+
+	return ctx.JSON(responseData)
+}
+
 
 func UpdateParamDetail(ctx *fiber.Ctx) error {
 	id := ctx.Params("paramDetailID")

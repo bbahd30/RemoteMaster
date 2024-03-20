@@ -25,14 +25,6 @@ func CreateParamValue(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	result := new(models.Result)
-    if err := database.DB.Where("id = ?", paramValue.ResultID).First(result).Error; err != nil {
-        return err
-    }
-	result.ParameterResults = append(result.ParameterResults, *paramValue)
-	if err := database.DB.Save(result).Error; err != nil {
-        return err
-    }
 	return ctx.JSON(paramValue)
 }
 
@@ -64,29 +56,30 @@ func GetParamValue(ctx *fiber.Ctx) error {
 }
 
 func GetTestValue(ctx *fiber.Ctx) error {
-	parameterID := ctx.Params("parameterID")
-	testID := ctx.Params("testID")
+    parameterID := ctx.Params("parameterID")
+    bookingID := ctx.Params("bookingID")
 
-	parameterUUID, err := uuid.Parse(parameterID)
-	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid parameter ID"})
-	}
+    paramUUID, err := uuid.Parse(parameterID)
+    if err != nil {
+        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid parameterID"})
+    }
+    bookingUUID, err := uuid.Parse(bookingID)
+    if err != nil {
+        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid bookingID"})
+    }
 
-	testUUID, err := uuid.Parse(testID)
-	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid test ID"})
-	}
+    paramValue := new(models.ParamValue)
+    result := database.DB.Where("booking_id = ? AND parameter_id = ?", bookingUUID, paramUUID).First(&paramValue)
 
-	ParamValue := new(models.ParamValue)
+    if result.Error != nil {
+        if result.Error == gorm.ErrRecordNotFound {
+			return ctx.JSON(nil)
+            // return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "ParamValue not found"})
+        }
+        return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal Server Error"})
+    }
 
-	if err := database.DB.Where("parameter_id = ? AND test_id = ?", parameterUUID, testUUID).First(ParamValue).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "ParamValue not found"})
-		}
-		return err
-	}
-
-    return ctx.JSON(ParamValue.Value)
+    return ctx.JSON(paramValue.Value)
 }
 
 

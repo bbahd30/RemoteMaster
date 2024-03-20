@@ -3,22 +3,6 @@ import HumanSVG from "./HumanSVG";
 import { Button } from "@mui/material";
 import { useSelector } from "react-redux";
 
-const usedColors = new Set();
-
-const generateRandomColor = () => {
-	let color = "";
-	do {
-		const r = Math.floor(Math.random() * 128);
-		const g = Math.floor(Math.random() * 128);
-		const b = Math.floor(Math.random() * 128);
-		color = `#${r.toString(16).padStart(2, "0")}${g
-			.toString(16)
-			.padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
-	} while (usedColors.has(color));
-	usedColors.add(color);
-	return color;
-};
-
 const HumanBodySVG = () => {
 	const [clicks, setClicks] = useState([]);
 	const [clickLimit, setClickLimit] = useState(0);
@@ -31,7 +15,6 @@ const HumanBodySVG = () => {
 
 	const handleSvgClick = (event) => {
 		if (currentClickCount >= clickLimit) return;
-		console.log("***");
 		const svg = document.getElementById("humanBody");
 		if (!svg) return;
 

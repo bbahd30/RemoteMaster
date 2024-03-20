@@ -4,7 +4,6 @@ import (
 	"backend/database"
 	models "backend/models"
 	"fmt"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -14,11 +13,12 @@ import (
 func CreatePatient(ctx *fiber.Ctx) error {
 	type CreatePatientRequest struct {
 		Name         string    `json:"name"`
-		DateOfBirth  time.Time `json:"date_of_birth"`
+		DateOfBirth  string    `json:"dob"`
 		Gender       string    `json:"gender"`
 		ContactPhone string    `json:"contact_phone"`
 		Email        string    `json:"email"`
 		Address      string    `json:"address"`
+		Age 		int       `json:"age"`
 	}
 
 	req := new(CreatePatientRequest)
@@ -38,6 +38,7 @@ func CreatePatient(ctx *fiber.Ctx) error {
 		ContactPhone: req.ContactPhone,
 		Email:        req.Email,
 		Address:      req.Address,
+		Age: 		  req.Age,
 	}
 
 	if err := database.DB.Create(&patient).Error; err != nil {
@@ -78,11 +79,12 @@ func GetPatient(ctx *fiber.Ctx) error {
 func UpdatePatient(ctx *fiber.Ctx) error {
 	type PutPatientRequest struct {
 		Name         string    `json:"name"`
-		DateOfBirth  time.Time `json:"date_of_birth"`
+		DateOfBirth  string `json:"dob"`
 		Gender       string    `json:"gender"`
 		ContactPhone string    `json:"contact_phone"`
 		Email        string    `json:"email"`
 		Address      string    `json:"address"`
+		Age 		int       `json:"age"`
 	}
 
 	id := ctx.Params("patientId")
@@ -111,6 +113,7 @@ func UpdatePatient(ctx *fiber.Ctx) error {
 	patient.ContactPhone = req.ContactPhone
 	patient.Email = req.Email
 	patient.Address = req.Address
+	patient.Age = req.Age
 
 	database.DB.Save(&patient)
 	return ctx.SendString("Patient updated successfully")

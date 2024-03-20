@@ -96,13 +96,11 @@ const bookingSlice = createSlice({
 			})
 			.addCase(createBooking.fulfilled, (state, action) => {
 				state.loading = false;
-				state.bookingsList = [];
 				state.selectedBooking = [];
 				state.error = "";
 			})
 			.addCase(createBooking.rejected, (state, action) => {
 				state.loading = false;
-				state.bookingsList = [];
 				state.selectedBooking = [];
 				state.error = action.error.message;
 			});

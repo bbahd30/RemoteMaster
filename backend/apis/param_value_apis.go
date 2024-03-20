@@ -19,7 +19,7 @@ func GetParamValue(paramValueGroup fiber.Router) {
 }
 
 func GetTestValue(paramValueGroup fiber.Router) {
-	paramValueGroup.Get("/:parameterID/:testID", func(ctx *fiber.Ctx) error {
+	paramValueGroup.Get("/:parameterID/:bookingID", func(ctx *fiber.Ctx) error {
 		return controllers.GetTestValue(ctx)
 	})
 }

@@ -14,12 +14,10 @@ type Booking struct {
 	Patient        Patient   `gorm:"foreignKey:PatientID;not null;default:null"`
 	TestID         uuid.UUID `json:"testID" gorm:"type:uuid;not null;default:null"`
 	Test           Test      `gorm:"foreignKey:TestID;not null;default:null"`
-	CollectionDate time.Time `json:"c_date"`
+	CollectionDate string `json:"c_date"`
 	BookingDate    time.Time `json:"b_date"`
 	LeadID         uuid.UUID `json:"leadID"`
 	Lead           User      `gorm:"foreignKey:LeadID"`
-	ResultID       uuid.UUID `json:"resultID"`
-	Result         Result    `gorm:"foreignKey:ResultID;constraint:OnDelete:CASCADE"`
 }
 
 func (booking *Booking) BeforeCreate(tx *gorm.DB) (err error) {

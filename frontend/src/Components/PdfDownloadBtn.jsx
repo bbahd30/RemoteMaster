@@ -3,6 +3,8 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import BookingDialogPDF from "./BookingDialogPDF";
 import { Button } from "@mui/material";
 import html2canvas from "html2canvas";
+import useStatusData from "../utils/useStatusData";
+import { useSelector } from "react-redux";
 
 const linkStyle = {
 	textDecoration: "none",
@@ -25,10 +27,28 @@ const PDFDownloadBtn = ({ patient, test, bodyImage, paramRef }) => {
 			});
 		}
 	}, [bodyImage]);
+	const overallStatus = useStatusData();
+	const statusData = useSelector((state) => state.parameter.StatusData);
+	const parameters = useSelector(
+		(state) => state.test.selectedTest.parameters
+	);
+	const [finalData, setFinalData] = useState(null);
+
+	useEffect(() => {
+		const combinedData = statusData?.map((statusItem, index) => {
+			const parameterItem = parameters[index];
+			return {
+				...statusItem,
+				param_name: parameterItem.param_name,
+			};
+		});
+
+		setFinalData(combinedData);
+	}, [statusData]);
 
 	return (
 		<Button>
-			{bodyImage && paramImg && (
+			{finalData?.length > 0 && bodyImage && paramImg && (
 				<PDFDownloadLink
 					document={
 						<BookingDialogPDF
@@ -36,6 +56,8 @@ const PDFDownloadBtn = ({ patient, test, bodyImage, paramRef }) => {
 							test={test}
 							bodyImage={bodyImage}
 							paramImg={paramImg}
+							overallStatus={overallStatus}
+							statusData={finalData}
 						/>
 					}
 					fileName="booking-dialog.pdf"

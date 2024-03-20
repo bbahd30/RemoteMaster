@@ -26,8 +26,10 @@ import PDFDownloadBtn from "./PdfDownloadBtn";
 import HumanBodySVG from "./HumanBody/HumanBody";
 import svgToDataURL from "./svgToDataURL";
 import generateRandomColor from "../utils/colorGenerate";
+import useGetParaIDs from "../utils/useGetParaIDs";
 
 const BookingDialog = () => {
+	useGetParaIDs();
 	const dispatch = useDispatch();
 	const [generate, setGenerate] = useState(false);
 	const open = useSelector((state) => state.booking.open);
@@ -72,24 +74,19 @@ const BookingDialog = () => {
 	});
 
 	useEffect(() => {
-		let params = [];
-		parameters?.map((param) => {
-			let value = {
-				id: param.ID,
-			};
-			params.push(value);
-		});
-		if (params?.length > 0) {
-			dispatch(setParameterIDs(params));
-		}
-	}, [test]);
-
-	useEffect(() => {
 		if (parameters?.length > 0) {
+			let usedColors = new Set();
 			let orderColor = [];
-			parameters?.map((param) => {
-				orderColor.push(generateRandomColor());
-			});
+
+			for (let param of parameters) {
+				let color;
+				do {
+					color = generateRandomColor();
+				} while (usedColors.has(color));
+				usedColors.add(color);
+				orderColor.push(color);
+			}
+
 			dispatch(setOrderColor(orderColor));
 		}
 	}, [parameters]);
@@ -127,10 +124,10 @@ const BookingDialog = () => {
 				</Toolbar>
 			</AppBar>
 			<Box p={2}>
-				<Typography fontFamily={"Poppins"} variant="h4">
-					Test Record
+				<Typography fontFamily={"Poppins"} variant="h6">
+					Test Records
 				</Typography>
-				<Typography fontFamily={"Poppins"} variant="h6" sx={{ p: 2 }}>
+				<Typography fontFamily={"Poppins"} variant="h4" sx={{ p: 2 }}>
 					{test?.test_name}
 				</Typography>
 				<Box

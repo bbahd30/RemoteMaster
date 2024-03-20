@@ -13,6 +13,8 @@ import BookingPage from "./Pages/BookingPage";
 
 import Sidebar from "./Components/Sidebar";
 import Navigation from "./Components/Navigation";
+import ParameterPage from "./Pages/ParameterPage";
+import PatientPage from "./Pages/PatientPage";
 
 function App() {
 	return (
@@ -36,8 +38,18 @@ function AppContent() {
 				<div style={{ padding: 16 }}>
 					<Routes>
 						<Route exact path="/" element={<LoginPage />} />
-						<Route exact path="/home" element={<HomePage />} />
 						<Route exact path="/tests" element={<TestPage />} />
+						<Route
+							exact
+							path="/patients"
+							element={<PatientPage />}
+						/>
+
+						<Route
+							exact
+							path="/parameters"
+							element={<ParameterPage />}
+						/>
 						<Route
 							exact
 							path="/bookings"
