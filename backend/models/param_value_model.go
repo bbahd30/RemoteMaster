@@ -11,7 +11,7 @@ type ParamValue struct {
 	gorm.Model
 	ID          uuid.UUID `gorm:"primaryKey;type:uuid"`
 	BookingID uuid.UUID `json:"bookingID" gorm:"type:uuid;index;,foreignKey"`
-	Value       float64   `json:"value" gorm:"type:decimal(10,2),not null;"`
+	Value       float64   `json:"value" gorm:"type:decimal(10,2)"`
 	ParameterID uuid.UUID `json:"parameterID" gorm:"type:uuid"`
 }
 

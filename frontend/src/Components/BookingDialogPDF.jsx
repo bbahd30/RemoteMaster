@@ -242,16 +242,29 @@ const BookingDialogPDF = ({
 										))}
 								</View>
 							)}
-							{param.upper_text && (
-								<View>
-									<Text style={styles.data}>
+							{param.upper_reasons && (
+								<View style={styles.box}>
+									<Text style={styles.boxHeading}>
+										Reasons
+									</Text>
+									<Text
+										style={[
+											styles.boxContent,
+											styles.highlightText,
+										]}
+									>
 										{param.upper_text}
 									</Text>
-									{param.upper_reasons && (
-										<Text style={styles.data}>
-											Reasons: {param.upper_reasons}
-										</Text>
-									)}
+									{param.upper_reasons
+										.split(",")
+										.map((reason, idx) => (
+											<Text
+												key={idx}
+												style={styles.bulletPoint}
+											>
+												• {reason.trim()}
+											</Text>
+										))}
 								</View>
 							)}
 						</View>
