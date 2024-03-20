@@ -24,6 +24,12 @@ func GetParamDetails(paramDetailGroup fiber.Router) {
 	})
 }
 
+func GetStatusData(paramDetailGroup fiber.Router) {
+	paramDetailGroup.Post("/status", func(ctx *fiber.Ctx) error {
+		return controllers.GetStatusData(ctx)
+	})
+}
+
 func UpdateParamDetail(paramDetailGroup fiber.Router) {
 	paramDetailGroup.Put("/:paramDetailID", func(ctx *fiber.Ctx) error {
 		return controllers.UpdateParamDetail(ctx)

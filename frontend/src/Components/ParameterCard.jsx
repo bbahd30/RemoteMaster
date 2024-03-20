@@ -6,7 +6,6 @@ import useGenerateParaValues from "../utils/useGenerateParaValues";
 import { addTestValue } from "../Slices/parameterSlice";
 
 const TestValueForm = ({ paramID }) => {
-	console.log(paramID);
 	const dispatch = useDispatch();
 	const bookingID = useSelector((state) => state.booking.selectedBooking);
 	const [value, setValue] = useState(0);
@@ -97,8 +96,8 @@ const ParameterCard = ({ parameter, color }) => {
 						position: "absolute",
 						right: 8,
 						top: 8,
-						width: 12,
-						height: 12,
+						width: 24,
+						height: 24,
 						borderRadius: "50%",
 						backgroundColor: color,
 					}}

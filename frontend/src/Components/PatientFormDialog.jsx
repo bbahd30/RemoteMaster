@@ -8,7 +8,7 @@ import {
 	Button,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
-import { createPatient } from "../Slices/patientSlice";
+import { createPatient, getPatients } from "../Slices/patientSlice";
 
 const PatientFormDialog = ({ open, handleClose }) => {
 	const dispatch = useDispatch();
@@ -32,7 +32,14 @@ const PatientFormDialog = ({ open, handleClose }) => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		dispatch(createPatient(form));
+		dispatch(createPatient(form))
+			.unwrap()
+			.then((response) => {
+				dispatch(getPatients());
+			})
+			.catch((error) => {
+				console.error("Failed to create the patient:", error);
+			});
 		handleClose();
 	};
 

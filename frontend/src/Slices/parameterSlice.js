@@ -111,6 +111,24 @@ export const getValue = createAsyncThunk(
 	}
 );
 
+export const getStatusData = createAsyncThunk(
+	"paramDetail/getStatusData",
+	(data) => {
+		return axios
+			.post(`${paramDetailApi}status`, data)
+			.then((response) => {
+				if (response.status === 200) {
+					return response.data;
+				}
+			})
+			.catch((error) => {
+				throw new Error(
+					error.response.data.message || "An error occurred"
+				);
+			});
+	}
+);
+
 export const createParameter = createAsyncThunk(
 	"parameter/add",
 	(parameterData) => {
@@ -207,7 +225,9 @@ const parameterSlice = createSlice({
 			})
 			.addCase(getBounds.fulfilled, (state, action) => {
 				state.loading = false;
-				state.paramDetailFilled = true;
+				if (action.payload.data === null) {
+					state.paramDetailFilled = false;
+				} else state.paramDetailFilled = true;
 				const { paramID, data } = action.payload;
 				state.parameterIDsList = state.parameterIDsList.map((param) =>
 					param.id === paramID ? { ...param, ...data } : param
@@ -264,6 +284,19 @@ const parameterSlice = createSlice({
 				state.loading = false;
 				state.paramDetail = false;
 				state.selected = [];
+				state.error = action.error.message;
+			})
+			.addCase(getStatusData.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(getStatusData.fulfilled, (state, action) => {
+				state.loading = false;
+				state.StatusData = action.payload;
+				state.error = "";
+			})
+			.addCase(getStatusData.rejected, (state, action) => {
+				state.loading = false;
+				state.StatusData = [];
 				state.error = action.error.message;
 			});
 	},

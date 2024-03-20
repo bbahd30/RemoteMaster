@@ -113,4 +113,5 @@ func (fiberApp *BaseFiberApp) registerParamDetailApis() {
 	apis.UpdateParamDetail(paramDetailRouter)
 	apis.DeleteParamDetail(paramDetailRouter)
 	apis.GetBounds(paramDetailRouter)
+	apis.GetStatusData(paramDetailRouter)
 }

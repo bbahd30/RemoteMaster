@@ -9,14 +9,19 @@ import {
 	Grid,
 	Typography,
 	List,
+	TextareaAutosize,
+	Divider,
+	Chip,
+	Card,
 } from "@mui/material";
+
 import useGetParaIDs from "../utils/useGetParaIDs";
 import useGenerateParaValues from "../utils/useGenerateParaValues";
 import { useDispatch, useSelector } from "react-redux";
 import { createBound } from "../Slices/parameterSlice";
+import { AddCircleOutline } from "@mui/icons-material";
 
 const ParamForm = ({ testID, handleClose, param }) => {
-	console.log(param);
 	const dispatch = useDispatch();
 
 	const [formValues, setFormValues] = useState({
@@ -24,9 +29,31 @@ const ParamForm = ({ testID, handleClose, param }) => {
 		upper_bound: null,
 		unit: "",
 		lower_text: "",
-		normal_text: "",
 		upper_text: "",
+		lower_reasons: [""],
+		upper_reasons: [""],
 	});
+
+	const handleReasons = (e, index, type) => {
+		const { name, value } = e.target;
+		if (type === "reason") {
+			const reasons = formValues[name].slice();
+			reasons[index] = value;
+			setFormValues({ ...formValues, [name]: reasons });
+		} else {
+			let modifiedValue =
+				name === "lower_bound" || name === "upper_bound"
+					? parseFloat(value)
+					: value;
+			if (
+				isNaN(modifiedValue) &&
+				(name === "lower_bound" || name === "upper_bound")
+			) {
+				modifiedValue = null;
+			}
+			setFormValues({ ...formValues, [name]: modifiedValue });
+		}
+	};
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -47,15 +74,24 @@ const ParamForm = ({ testID, handleClose, param }) => {
 
 	const handleSubmit = (event, paramID) => {
 		event.preventDefault();
-		let data = { ...formValues, paramID: paramID, testID: testID };
+		let lowerReasonsString = formValues.lower_reasons.join(",");
+		let upperReasonsString = formValues.upper_reasons.join(",");
+		let data = {
+			...formValues,
+			lower_reasons: lowerReasonsString,
+			upper_reasons: upperReasonsString,
+			paramID: paramID || param.ID,
+			testID: testID,
+		};
 		console.log(data);
 		dispatch(createBound(data));
-		setFormValues({
-			lower_bound: null,
-			upper_bound: null,
-			unit: "",
-		});
-		handleClose();
+	};
+
+	const addReasonField = (type) => {
+		setFormValues((prevState) => ({
+			...prevState,
+			[type]: [...prevState[type], ""],
+		}));
 	};
 
 	return (
@@ -100,12 +136,97 @@ const ParamForm = ({ testID, handleClose, param }) => {
 					/>
 				</Grid>
 			</Grid>
+			<Divider sx={{ mt: 2 }}>
+				<Chip label="Lower Range" size="small" />
+			</Divider>
+			<>
+				<TextField
+					fullWidth
+					multiline
+					rows={4}
+					margin="normal"
+					variant="outlined"
+					name="lower_text"
+					label="Health Advice for Lower Range"
+					id="lower_text"
+					value={formValues.lower_text}
+					onChange={handleChange}
+				/>
+				{formValues.lower_reasons?.map((reason, index) => (
+					<Box
+						key={index}
+						sx={{
+							display: "flex",
+							alignItems: "center",
+							gap: 1,
+							mb: 2,
+						}}
+					>
+						<TextField
+							fullWidth
+							variant="outlined"
+							name="lower_reasons"
+							label={`Reason #${index + 1} for lower range`}
+							value={reason}
+							onChange={(e) => handleReasons(e, index, "reason")}
+						/>
+						{index === formValues.lower_reasons.length - 1 && (
+							<AddCircleOutline
+								sx={{ color: "primary" }}
+								onClick={() => addReasonField("lower_reasons")}
+							/>
+						)}
+					</Box>
+				))}
+			</>
+			<Divider>
+				<Chip label="Higher Range" size="small" />
+			</Divider>
+			<>
+				<TextField
+					fullWidth
+					multiline
+					rows={4}
+					margin="normal"
+					variant="outlined"
+					name="upper_text"
+					label="Health Advice for Higher Range"
+					id="upper_text"
+					value={formValues.upper_text}
+					onChange={handleChange}
+					style={{ marginBottom: "1.5rem" }}
+				/>
+				{formValues.upper_reasons?.map((reason, index) => (
+					<Box
+						key={index}
+						sx={{
+							display: "flex",
+							alignItems: "center",
+							gap: 1,
+							mb: 2,
+						}}
+					>
+						<TextField
+							fullWidth
+							variant="outlined"
+							name="upper_reasons"
+							label={`Reason #${index + 1} higher range`}
+							value={reason}
+							onChange={(e) => handleReasons(e, index, "reason")}
+						/>
+						{index === formValues.upper_reasons.length - 1 && (
+							<AddCircleOutline
+								sx={{ color: "primary" }}
+								onClick={() => addReasonField("upper_reasons")}
+							/>
+						)}
+					</Box>
+				))}
+			</>
 			<Button
 				type="submit"
 				variant="contained"
 				sx={{
-					mt: 1,
-					mb: 3,
 					width: "max-content",
 				}}
 			>
@@ -114,15 +235,24 @@ const ParamForm = ({ testID, handleClose, param }) => {
 		</Box>
 	);
 };
+
 const TestDetailForm = ({ open, handleClose, selectedTest }) => {
 	useGetParaIDs();
 	useGenerateParaValues();
 
 	const form = useSelector((state) => state.parameter.paramDetailFilled);
 	const params = useSelector((state) => state.parameter?.parameterIDsList);
+	const paramDetails = useSelector(
+		(state) => state.parameter?.parametersList
+	);
+	let itemsToRender = params?.some((param) => "name" in param)
+		? params
+		: paramDetails;
+
+	console.log(itemsToRender);
 
 	return (
-		<Dialog maxWidth="xl" open={open} onClose={handleClose}>
+		<Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
 			<DialogTitle>
 				<Typography
 					variant="h6"
@@ -133,7 +263,7 @@ const TestDetailForm = ({ open, handleClose, selectedTest }) => {
 				</Typography>
 			</DialogTitle>
 			<DialogContent>
-				<Box sx={{ width: 400, m: "auto" }}>
+				<Box>
 					<Typography variant="body1" sx={{ fontFamily: "Poppins" }}>
 						<strong>Name:</strong> {selectedTest?.test_name}
 					</Typography>
@@ -143,25 +273,27 @@ const TestDetailForm = ({ open, handleClose, selectedTest }) => {
 					>
 						<strong>Code:</strong> {selectedTest?.test_code}
 					</Typography>
-					<Typography
-						variant="body1"
-						sx={{ fontFamily: "Poppins", mt: 1 }}
-					>
-						<strong>Method:</strong> {selectedTest?.test_method}
-					</Typography>
-					{form && params && (
+					{selectedTest?.test_method && (
+						<Typography
+							variant="body1"
+							sx={{ fontFamily: "Poppins", mt: 1 }}
+						>
+							<strong>Method:</strong> {selectedTest?.test_method}
+						</Typography>
+					)}
+					{form && itemsToRender && (
 						<Box mt={2}>
 							<Typography
 								variant="body1"
-								sx={{ fontFamily: "Poppins" }}
+								sx={{ fontFamily: "Poppins", mb: 1 }}
 							>
 								<strong>Parameters:</strong>
 							</Typography>
 							<List>
-								{params?.map((param) => (
+								{itemsToRender?.map((param) => (
 									<>
 										<Typography
-											key={param.ID}
+											key={param.id}
 											variant="body1"
 											sx={{
 												fontFamily: "Poppins",
@@ -185,27 +317,51 @@ const TestDetailForm = ({ open, handleClose, selectedTest }) => {
 				{!form && (
 					<>
 						<Typography
-							variant="body1"
-							sx={{ fontFamily: "Poppins" }}
+							variant="h6"
+							sx={{ fontFamily: "Poppins", mb: 2, mt: 4 }}
 						>
 							<strong>Parameters:</strong>
 						</Typography>
-						{params?.map((param) => (
-							<>
-								<Typography
+						<Box
+							sx={{
+								display: "flex",
+								flexDirection: "row",
+								flexWrap: "wrap",
+								gap: 2,
+							}}
+						>
+							{itemsToRender?.map((param, index) => (
+								<Card
+									variant="outlined"
+									sx={{
+										flex: "1 1 auto",
+										minWidth: "300px",
+										mb: 4,
+										mt: index === 0 ? 0 : 4,
+										p: 2,
+										boxShadow: 3,
+									}}
 									key={param.ID}
-									variant="body1"
-									sx={{ fontFamily: "Poppins", mb: 1 }}
 								>
-									{param.param_name}
-								</Typography>
-								<ParamForm
-									param={param}
-									testID={selectedTest?.ID}
-									handleClose={handleClose}
-								/>
-							</>
-						))}
+									<Typography
+										variant="h5"
+										sx={{
+											fontFamily: "Poppins",
+											mb: 2,
+											fontWeight: "fontWeightMedium",
+										}}
+									>
+										{param.param_name}
+									</Typography>
+									<Divider sx={{ mb: 2 }} />
+									<ParamForm
+										param={param}
+										testID={selectedTest?.ID}
+										handleClose={handleClose}
+									/>
+								</Card>
+							))}
+						</Box>
 					</>
 				)}
 			</DialogContent>

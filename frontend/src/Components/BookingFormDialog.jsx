@@ -14,7 +14,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { getPatients } from "../Slices/patientSlice";
 import { getTests } from "../Slices/testSlice";
-import { createBooking } from "../Slices/bookingSlice";
+import { createBooking, getBookings } from "../Slices/bookingSlice";
 
 const BookingFormDialog = () => {
 	const dispatch = useDispatch();
@@ -46,7 +46,14 @@ const BookingFormDialog = () => {
 				patientID: selectedPatient,
 				leadID: userID,
 			})
-		);
+		)
+			.unwrap()
+			.then((response) => {
+				dispatch(getBookings());
+			})
+			.catch((error) => {
+				console.error("Failed to create the bookings:", error);
+			});
 		handleClose();
 	};
 

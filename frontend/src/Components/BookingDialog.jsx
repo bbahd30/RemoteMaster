@@ -75,10 +75,18 @@ const BookingDialog = () => {
 
 	useEffect(() => {
 		if (parameters?.length > 0) {
+			let usedColors = new Set();
 			let orderColor = [];
-			parameters?.map((param) => {
-				orderColor.push(generateRandomColor());
-			});
+
+			for (let param of parameters) {
+				let color;
+				do {
+					color = generateRandomColor();
+				} while (usedColors.has(color));
+				usedColors.add(color);
+				orderColor.push(color);
+			}
+
 			dispatch(setOrderColor(orderColor));
 		}
 	}, [parameters]);
