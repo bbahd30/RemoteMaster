@@ -32,7 +32,7 @@ const PDFDownloadBtn = ({ patient, test, bodyImage, paramRef }) => {
 	const parameters = useSelector(
 		(state) => state.test.selectedTest.parameters
 	);
-	const [dataToRender, setDataToRender] = useState([]);
+	const [finalData, setFinalData] = useState(null);
 
 	useEffect(() => {
 		const combinedData = statusData?.map((statusItem, index) => {
@@ -43,12 +43,12 @@ const PDFDownloadBtn = ({ patient, test, bodyImage, paramRef }) => {
 			};
 		});
 
-		console.log(combinedData);
+		setFinalData(combinedData);
 	}, [statusData]);
 
 	return (
 		<Button>
-			{dataToRender.length > 0 && bodyImage && paramImg && (
+			{finalData?.length > 0 && bodyImage && paramImg && (
 				<PDFDownloadLink
 					document={
 						<BookingDialogPDF
@@ -57,7 +57,7 @@ const PDFDownloadBtn = ({ patient, test, bodyImage, paramRef }) => {
 							bodyImage={bodyImage}
 							paramImg={paramImg}
 							overallStatus={overallStatus}
-							statusData={statusData}
+							statusData={finalData}
 						/>
 					}
 					fileName="booking-dialog.pdf"
