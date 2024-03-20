@@ -4,6 +4,8 @@ ReportMaster is a comprehensive healthcare management system designed to streaml
 
 One of the key features of the application is its ability to store and analyze parameter values against normal ranges, providing valuable insights into a patient's health status. It also includes a visual representation of the human body, allowing to pinpoint affected organs and areas diagnosed in tests. Additionally, a meter feature provides a clear indication of parameter values, aiding in quick and easy interpretation of test results.
 
+### [Video Demonstration](https://drive.google.com/file/d/1xN-0c3GXU46jAj5GNNmyWZJYjlOz7xR5/view?usp=sharing)
+
 ## Installation
 
 To install and run the app, follow these steps:
